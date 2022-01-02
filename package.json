@@ -1,9 +1,8 @@
 {
-  "version": "0.0.0",
-  "name": "TODO",
-  "umd:name": "TODO",
-  "repository": "TODO_USERNAME/TODO_REPO",
-  "description": "TODO_MODULE_DESCRIPTION",
+  "version": "0.0.1",
+  "name": "moonhandler",
+  "repository": "MoonLGH/MoonHandler",
+  "description": "Simple command handler",
   "unpkg": "dist/index.min.js",
   "module": "dist/index.mjs",
   "main": "dist/index.js",
@@ -26,25 +25,33 @@
     "./package.json": "./package.json"
   },
   "engines": {
-    "node": ">= 10"
+    "node": ">= 14"
   },
   "scripts": {
     "build": "rollup -c",
     "prepublishOnly": "npm run build",
-    "test": "uvu -r ts-node/register test"
+    "test": "uvu -r ts-node/register test",
+    "lint": "eslint src",
+    "lint-fix": "eslint src --fix"
   },
   "keywords": [
-    "TODO",
-    "module",
-    "keywords"
+    "Handler"
   ],
   "devDependencies": {
     "@rollup/plugin-node-resolve": "8.1.0",
+    "@types/estree": "^0.0.50",
+    "@typescript-eslint/eslint-plugin": "^5.7.0",
+    "@typescript-eslint/parser": "^5.7.0",
+    "eslint": "^8.4.1",
+    "eslint-config-google": "^0.14.0",
     "rollup": "2.21.0",
     "rollup-plugin-terser": "6.1.0",
     "rollup-plugin-typescript2": "0.27.1",
     "ts-node": "8.10.2",
     "typescript": "3.9.6",
     "uvu": "0.0.19"
+  },
+  "dependencies": {
+    "@discordjs/collection": "^0.4.0"
   }
 }
