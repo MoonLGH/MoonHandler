@@ -5,6 +5,7 @@ import * as assert from "uvu/assert";
 test("hasCategory", async ()=>{
   const handlerClient = new Handler({
     path: "./test/commands/$category/$commands",
+    ignoreCategories: ["catergoryExample2"],
   });
   await handlerClient.HandleCommand();
   if (!Array.isArray(handlerClient.files)) throw new Error("files is not an array");
@@ -12,6 +13,7 @@ test("hasCategory", async ()=>{
   assert.type(handlerClient.path, "string");
   assert.ok(handlerClient.Commands.size > 0);
   assert.ok(handlerClient.findCommand("test"));
+  console.log(handlerClient.categories)
 });
 
 test("noCategory", async ()=>{

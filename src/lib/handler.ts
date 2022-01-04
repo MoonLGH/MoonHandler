@@ -1,5 +1,7 @@
 interface HandlerOptions {
     path:string;
+    ignoreCategories?: string[];
+    ignoreFiles?: string[];
 }
 
 import * as fs from "fs";
@@ -12,6 +14,8 @@ export class Handler {
   path: string;
   Commands: Collection<string, Command>;
   ready = false;
+  ignoreCategories?: string[];
+  ignoreFiles?: string[];
   constructor(options:HandlerOptions={path: ""}) {
     this.Commands = new Collection<string, Command>();
     if (!options.path || !options.path.includes("$commands")) {
@@ -22,16 +26,26 @@ export class Handler {
     if (options.path.includes("$category")) {
       this.hasCategories = true;
     }
+    if ("ignoreCategories" in options) {
+      this.ignoreCategories = options.ignoreCategories;
+    }
+    if ("ignoreFiles" in options) {
+      this.ignoreFiles = options.ignoreFiles;
+    }
   }
 
   get categories() {
     if (!this.hasCategories) throw new Error("you dont have categories in your path");
     const categoryPath = this.path.split("$category")[0];
-    return fs.readdirSync(categoryPath, {withFileTypes: true}).filter((dirent) => dirent.isDirectory()).map((dirent) => dirent.name);
+    let cats = fs.readdirSync(categoryPath, {withFileTypes: true}).filter((dirent) => dirent.isDirectory());
+    if (this.ignoreCategories) {
+      cats = cats.filter((cat) => !(this.ignoreCategories!.includes(cat.name)));
+    }
+    return cats.map((dirent) => dirent.name);
   }
 
   get files() {
-    const files = [];
+    let files = [];
     if (this.hasCategories) {
       for (const cat of this.categories) {
         for (const file of fs.readdirSync(this.path.split("$category")[0] + cat)) {
@@ -43,7 +57,11 @@ export class Handler {
         }
       }
     }
-    return this.hasCategories ? files : fs.readdirSync(this.path.split("$commands")[0], {withFileTypes: true}).filter((dirent) => dirent.isFile()).map((dirent) => ({fileName: dirent.name, path: this.path.replace("$commands", dirent.name)}));
+    files = this.hasCategories ? files : fs.readdirSync(this.path.split("$commands")[0], {withFileTypes: true}).filter((dirent) => dirent.isFile()).map((dirent) => ({fileName: dirent.name, path: this.path.replace("$commands", dirent.name)}));
+    if (this.ignoreFiles) {
+      files = files.filter((file) => !(this.ignoreFiles!.includes(file.fileName)));
+    }
+    return files;
   }
 
   async HandleCommand() {
